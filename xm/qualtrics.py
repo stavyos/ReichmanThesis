@@ -4,24 +4,23 @@ import os
 import time
 from typing import Tuple, List, Dict
 
-
 from QualtricsAPI import Responses
 from QualtricsAPI.XM import MailingList
 
-import mongo
+from mongodb import mongo
 
-os.environ['token'] = 'MYQm22dxYO0tsQ6o6UPSa4Xf6THvpqTx99aaM0Xf'
-os.environ['data_center'] = 'sjc1'
-os.environ['directory_id'] = 'POOL_3nUCQkhzyoceRg2'
+XM_TOKEN = os.environ['XM_TOKEN']
+XM_DATACENTER = os.environ['XM_DATACENTER']
+XM_DIRECTORY_ID = os.environ['XM_DIRECTORY_ID']
 
-MAILING_LIST = 'CG_2uvMA0rVMexhxE6'
-SURVEY = 'SV_8kWc1MTpZcGLBOu'
-DISTRIBUTION = 'EMD_PC5R0TCzZ9GRZ4y'
+MAILING_LIST = os.environ['XM_MAILING_LIST']
+SURVEY = os.environ['XM_SURVEY']
+DISTRIBUTION = os.environ['XM_DISTRIBUTION']
 
 
 def add_new_participant(participant_id: str, session_id: str) -> Tuple[str, str]:
-    m = MailingList(token=os.environ['token'], data_center=os.environ['data_center'],
-                    directory_id=os.environ['directory_id'])
+    m = MailingList(token=XM_TOKEN, data_center=XM_DATACENTER,
+                    directory_id=XM_DIRECTORY_ID)
 
     contact_id, contact_list_id = m.create_contact_in_list(mailing_list=MAILING_LIST,
                                                            first_name=participant_id, last_name=session_id)
@@ -31,11 +30,11 @@ def add_new_participant(participant_id: str, session_id: str) -> Tuple[str, str]
 # noinspection PyTypeChecker
 def auto_links_updater():
     def get_dist_links(distribution_id: str, survey_id: str, skip_token: str = '0') -> dict:
-        conn = http.client.HTTPSConnection(f"{os.environ['data_center']}.qualtrics.com")
+        conn = http.client.HTTPSConnection(f"{XM_DATACENTER}.qualtrics.com")
 
         headers = {
             'Content-Type': "application/json",
-            'X-API-TOKEN': os.environ['token']
+            'X-API-TOKEN': XM_TOKEN
         }
 
         endpoint = f"/API/v3/distributions/{distribution_id}/links?skipToken={skip_token}&surveyId={survey_id}"
@@ -113,11 +112,11 @@ def auto_response_updater():
 
 
 def delete_survey_response(survey_id: str, response_id: str):
-    conn = http.client.HTTPSConnection(f"{os.environ['data_center']}.qualtrics.com")
+    conn = http.client.HTTPSConnection(f"{XM_DATACENTER}.qualtrics.com")
 
     headers = {
         'Content-Type': "application/json",
-        'X-API-TOKEN': os.environ['token']
+        'X-API-TOKEN': XM_TOKEN
     }
 
     endpoint = f"/API/v3/surveys/{survey_id}/responses/{response_id}"
